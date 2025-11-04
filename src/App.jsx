@@ -1,140 +1,144 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbzfxNL3ZrnpwbgryyrRyvw-qpGwq7kd1TcdhMpvMoN_xaE7TJNK2uZaXQu6b33r_5e6/exec';
+
 function App() {
   const [data, setData] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [currentCode, setCurrentCode] = useState('');
-  const [currentDescription, setCurrentDescription] = useState('');
   const [newCode, setNewCode] = useState('');
-  const [newDescription, setNewDescription] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    const response = await fetch('/api/data');
-    const result = await response.json();
-    setData(result);
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}?func=get`);
+      const result = await response.json();
+      setData(result.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+    setIsLoading(false);
   };
 
   const handleAdd = async () => {
-    await fetch('/api/add', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code: newCode, description: newDescription }),
-    });
-    setNewCode('');
-    setNewDescription('');
-    fetchData();
+    if (!newCode) return;
+    setIsLoading(true);
+    try {
+      await fetch(`${API_BASE_URL}?func=add&Codes=${newCode}`);
+      setNewCode('');
+      fetchData();
+    } catch (error) {
+      console.error("Error adding data:", error);
+    }
+    setIsLoading(false);
   };
 
   const handleEdit = async () => {
-    await fetch('/api/edit', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ index: currentIndex, code: currentCode, description: currentDescription }),
-    });
-    setIsEditing(false);
-    setCurrentIndex(null);
-    setCurrentCode('');
-    setCurrentDescription('');
-    fetchData();
+    if (!currentCode || currentIndex === null) return;
+    setIsLoading(true);
+    try {
+      await fetch(`${API_BASE_URL}?func=edit&row=${currentIndex}&col=1&newValue=${currentCode}`);
+      setIsEditing(false);
+      setCurrentIndex(null);
+      setCurrentCode('');
+      fetchData();
+    } catch (error) {
+      console.error("Error editing data:", error);
+    }
+    setIsLoading(false);
   };
 
-  const handleDelete = async (index) => {
-    await fetch('/api/delete', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ index }),
-    });
-    fetchData();
+  const handleDelete = async (row) => {
+    setIsLoading(true);
+    try {
+      await fetch(`${API_BASE_URL}?func=delete&row=${row}`);
+      fetchData();
+    } catch (error) {
+      console.error("Error deleting data:", error);
+    }
+    setIsLoading(false);
   };
 
-  const openEditModal = (item, index) => {
+  const openEditModal = (item) => {
     setIsEditing(true);
-    setCurrentIndex(index);
-    setCurrentCode(item.code);
-    setCurrentDescription(item.description);
+    setCurrentIndex(item.row);
+    setCurrentCode(item.Codes);
   };
 
   const closeEditModal = () => {
     setIsEditing(false);
     setCurrentIndex(null);
     setCurrentCode('');
-    setCurrentDescription('');
   };
 
   return (
     <div className="container">
-      <h1>Admin Dashboard</h1>
-      <div className="card">
-        <div className="card-header">
-          <h2>Add New Code</h2>
+      {isLoading && <div className="loader"></div>}
+      <header>
+        <h1>Admin Control Panel</h1>
+      </header>
+      <main>
+        <div className="card add-card">
+          <div className="card-header">
+            <h2>Add New Code</h2>
+          </div>
+          <div className="card-body">
+            <input
+              type="text"
+              placeholder="Enter new code"
+              value={newCode}
+              onChange={(e) => setNewCode(e.target.value)}
+            />
+            <button onClick={handleAdd}>Add Code</button>
+          </div>
         </div>
-        <div className="card-body">
-          <input
-            type="text"
-            placeholder="Code"
-            value={newCode}
-            onChange={(e) => setNewCode(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Description"
-            value={newDescription}
-            onChange={(e) => setNewDescription(e.target.value)}
-          />
-          <button onClick={handleAdd}>Add</button>
-        </div>
-      </div>
-      <div className="card">
-        <div className="card-header">
-          <h2>Codes</h2>
-          <button onClick={() => window.open('/api/data', '_blank')}>View JSON</button>
-        </div>
-        <div className="card-body">
-          <table>
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Description</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.code}</td>
-                  <td>{item.description}</td>
-                  <td>
-                    <button onClick={() => openEditModal(item, index)}>Edit</button>
-                    <button onClick={() => handleDelete(index)}>Delete</button>
-                  </td>
+        <div className="card">
+          <div className="card-header">
+            <h2>Manage Codes</h2>
+          </div>
+          <div className="card-body">
+            <table>
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.map((item) => (
+                  <tr key={item.row}>
+                    <td>{item.Codes}</td>
+                    <td className="actions">
+                      <button className="edit-btn" onClick={() => openEditModal(item)}>Edit</button>
+                      <button className="delete-btn" onClick={() => handleDelete(item.row)}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </main>
       {isEditing && (
-        <div className="modal">
+        <div className="modal-overlay">
           <div className="modal-content">
-            <h2>Edit Code</h2>
+            <h2>Edit Code (Row: {currentIndex})</h2>
             <input
               type="text"
               value={currentCode}
               onChange={(e) => setCurrentCode(e.target.value)}
             />
-            <input
-              type="text"
-              value={currentDescription}
-              onChange={(e) => setCurrentDescription(e.target.value)}
-            />
-            <button onClick={handleEdit}>Save</button>
-            <button onClick={closeEditModal}>Cancel</button>
+            <div className="modal-actions">
+              <button onClick={handleEdit}>Save Changes</button>
+              <button className="cancel-btn" onClick={closeEditModal}>Cancel</button>
+            </div>
           </div>
         </div>
       )}
