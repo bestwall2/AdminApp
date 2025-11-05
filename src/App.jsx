@@ -111,6 +111,16 @@ function App() {
     }
     setIsLoading(false);
   };
+  const handleLink = async (item) => {
+  try {
+    // Builds the dynamic link using data from the current row
+    const url = `https://us-now.vercel.app/${item.UrlName}?groupid=${item.Codes}`;
+    // Optional: open it in a new tab
+    window.open(url, '_blank');
+  } catch (error) {
+    console.error("Error creating link:", error);
+  }
+  };
 
   const openEditModal = (item) => {
     setIsEditing(true);
@@ -191,6 +201,7 @@ function App() {
                     <td className="actions">
                       <button className="edit-btn" onClick={() => openEditModal(item)}>Edit</button>
                       <button className="delete-btn" onClick={() => handleDelete(item.row)}>Delete</button>
+                      <button className="link-btn" onClick={() => handleLink(item)}>Link</button>
                     </td>
                   </tr>
                 ))}
