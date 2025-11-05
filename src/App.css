@@ -223,6 +223,36 @@ tbody tr:hover {
   to { transform: translateY(0); opacity: 1; }
 }
 
+.color-picker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.color-picker-wrapper label {
+  font-weight: 600;
+}
+
+.color-picker-wrapper input[type="color"] {
+  width: 50px;
+  height: 50px;
+  border: none;
+  padding: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.color-swatch {
+  width: 25px;
+  height: 25px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-right: 10px;
+  vertical-align: middle;
+  border: 1px solid #eee;
+}
+
 @media (max-width: 768px) {
   header {
     padding: 20px;

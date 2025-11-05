@@ -8,7 +8,11 @@ function App() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [currentCode, setCurrentCode] = useState('');
+  const [currentUrlName, setCurrentUrlName] = useState('');
+  const [currentColorId, setCurrentColorId] = useState('#ffffff');
   const [newCode, setNewCode] = useState('');
+  const [newUrlName, setNewUrlName] = useState('');
+  const [newColorId, setNewColorId] = useState('#ffffff');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -28,11 +32,19 @@ function App() {
   };
 
   const handleAdd = async () => {
-    if (!newCode) return;
+    if (!newCode || !newUrlName) return;
     setIsLoading(true);
     try {
-      await fetch(`${API_BASE_URL}?func=add&Codes=${newCode}`);
+      const params = new URLSearchParams({
+        func: 'add',
+        Codes: newCode,
+        UrlName: newUrlName,
+        ColorId: newColorId,
+      });
+      await fetch(`${API_BASE_URL}?${params.toString()}`);
       setNewCode('');
+      setNewUrlName('');
+      setNewColorId('#ffffff');
       fetchData();
     } catch (error) {
       console.error("Error adding data:", error);
@@ -41,16 +53,49 @@ function App() {
   };
 
   const handleEdit = async () => {
-    if (!currentCode || currentIndex === null) return;
+    if (currentIndex === null) return;
     setIsLoading(true);
+
+    const originalItem = data.find(item => item.row === currentIndex);
+    const editPromises = [];
+
+    if (originalItem.Codes !== currentCode) {
+      const params = new URLSearchParams({
+        func: 'edit',
+        row: currentIndex,
+        col: 1,
+        newValue: currentCode,
+      });
+      editPromises.push(fetch(`${API_BASE_URL}?${params.toString()}`));
+    }
+    if (originalItem.UrlName !== currentUrlName) {
+      const params = new URLSearchParams({
+        func: 'edit',
+        row: currentIndex,
+        col: 2,
+        newValue: currentUrlName,
+      });
+      editPromises.push(fetch(`${API_BASE_URL}?${params.toString()}`));
+    }
+    if (originalItem.ColorId !== currentColorId) {
+      const params = new URLSearchParams({
+        func: 'edit',
+        row: currentIndex,
+        col: 3,
+        newValue: currentColorId,
+      });
+      editPromises.push(fetch(`${API_BASE_URL}?${params.toString()}`));
+    }
+
     try {
-      await fetch(`${API_BASE_URL}?func=edit&row=${currentIndex}&col=1&newValue=${currentCode}`);
+      await Promise.all(editPromises);
       setIsEditing(false);
       setCurrentIndex(null);
       setCurrentCode('');
+      setCurrentUrlName('');
+      setCurrentColorId('#ffffff');
       fetchData();
-    } catch (error) {
-      console.error("Error editing data:", error);
+    } catch (error)      console.error("Error editing data:", error);
     }
     setIsLoading(false);
   };
@@ -70,12 +115,16 @@ function App() {
     setIsEditing(true);
     setCurrentIndex(item.row);
     setCurrentCode(item.Codes);
+    setCurrentUrlName(item.UrlName);
+    setCurrentColorId(item.ColorId);
   };
 
   const closeEditModal = () => {
     setIsEditing(false);
     setCurrentIndex(null);
     setCurrentCode('');
+    setCurrentUrlName('');
+    setCurrentColorId('#ffffff');
   };
 
   return (
@@ -96,6 +145,22 @@ function App() {
               value={newCode}
               onChange={(e) => setNewCode(e.target.value)}
             />
+            <input
+              type="text"
+              placeholder="Enter URL name"
+              value={newUrlName}
+              onChange={(e) => setNewUrlName(e.target.value)}
+            />
+            <div className="color-picker-wrapper">
+              <label htmlFor="color-picker">Color ID:</label>
+              <input
+                id="color-picker"
+                type="color"
+                value={newColorId}
+                onChange={(e) => setNewColorId(e.target.value)}
+              />
+              <span>{newColorId}</span>
+            </div>
             <button onClick={handleAdd}>Add Code</button>
           </div>
         </div>
@@ -108,6 +173,8 @@ function App() {
               <thead>
                 <tr>
                   <th>Code</th>
+                  <th>URL Name</th>
+                  <th>Color</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -115,6 +182,11 @@ function App() {
                 {data.map((item) => (
                   <tr key={item.row}>
                     <td>{item.Codes}</td>
+                    <td>{item.UrlName}</td>
+                    <td>
+                      <div className="color-swatch" style={{ backgroundColor: item.ColorId }}></div>
+                      {item.ColorId}
+                    </td>
                     <td className="actions">
                       <button className="edit-btn" onClick={() => openEditModal(item)}>Edit</button>
                       <button className="delete-btn" onClick={() => handleDelete(item.row)}>Delete</button>
@@ -135,6 +207,21 @@ function App() {
               value={currentCode}
               onChange={(e) => setCurrentCode(e.target.value)}
             />
+            <input
+              type="text"
+              value={currentUrlName}
+              onChange={(e) => setCurrentUrlName(e.target.value)}
+            />
+            <div className="color-picker-wrapper">
+              <label htmlFor="edit-color-picker">Color ID:</label>
+              <input
+                id="edit-color-picker"
+                type="color"
+                value={currentColorId}
+                onChange={(e) => setCurrentColorId(e.target.value)}
+              />
+              <span>{currentColorId}</span>
+            </div>
             <div className="modal-actions">
               <button onClick={handleEdit}>Save Changes</button>
               <button className="cancel-btn" onClick={closeEditModal}>Cancel</button>
