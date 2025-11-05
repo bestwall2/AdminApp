@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import * as Dialog from '@radix-ui/react-dialog';
-import { Cross2Icon } from '@radix-ui/react-icons';
 import './App.css';
 
 const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbzfxNL3ZrnpwbgryyrRyvw-qpGwq7kd1TcdhMpvMoN_xaE7TJNK2uZaXQu6b33r_5e6/exec';
@@ -47,10 +45,10 @@ function App() {
       setNewCode('');
       setNewUrlName('');
       setNewColorId('#ffffff');
+      fetchData();
     } catch (error) {
       console.error("Error adding data:", error);
     }
-    await fetchData();
     setIsLoading(false);
   };
 
@@ -92,10 +90,14 @@ function App() {
     try {
       await Promise.all(editPromises);
       setIsEditing(false);
-    } catch (error) {
+      setCurrentIndex(null);
+      setCurrentCode('');
+      setCurrentUrlName('');
+      setCurrentColorId('#ffffff');
+      fetchData();
+    } catch (error){
       console.error("Error editing data:", error);
     }
-    await fetchData();
     setIsLoading(false);
   };
 
@@ -103,53 +105,55 @@ function App() {
     setIsLoading(true);
     try {
       await fetch(`${API_BASE_URL}?func=delete&row=${row}`);
+      fetchData();
     } catch (error) {
       console.error("Error deleting data:", error);
     }
-    await fetchData();
     setIsLoading(false);
   };
 
   const openEditModal = (item) => {
+    setIsEditing(true);
     setCurrentIndex(item.row);
     setCurrentCode(item.Codes);
     setCurrentUrlName(item.UrlName);
     setCurrentColorId(item.ColorId);
-    setIsEditing(true);
   };
 
-  const handleOpenLandingUrl = (item) => {
-    const urlName = item.UrlName.replace(/\s/g, '');
-    const url = `https://us-now.vercel.app/${urlName}?groupid=${item.Codes}`;
-    window.open(url, '_blank');
+  const closeEditModal = () => {
+    setIsEditing(false);
+    setCurrentIndex(null);
+    setCurrentCode('');
+    setCurrentUrlName('');
+    setCurrentColorId('#ffffff');
   };
 
   return (
     <div className="container">
       {isLoading && <div className="loader"></div>}
       <header>
-        <h1>لوحة تحكم المسؤول</h1>
+        <h1>Admin Control Panel</h1>
       </header>
       <main>
         <div className="card add-card">
           <div className="card-header">
-            <h2>إضافة كود جديد</h2>
+            <h2>Add New Code</h2>
           </div>
           <div className="card-body">
             <input
               type="text"
-              placeholder="أدخل الكود الجديد"
+              placeholder="Enter new code"
               value={newCode}
               onChange={(e) => setNewCode(e.target.value)}
             />
             <input
               type="text"
-              placeholder="أدخل اسم الرابط"
+              placeholder="Enter URL name"
               value={newUrlName}
               onChange={(e) => setNewUrlName(e.target.value)}
             />
             <div className="color-picker-wrapper">
-              <label htmlFor="color-picker">لون المعرف:</label>
+              <label htmlFor="color-picker">Color ID:</label>
               <input
                 id="color-picker"
                 type="color"
@@ -158,21 +162,21 @@ function App() {
               />
               <span>{newColorId}</span>
             </div>
-            <button onClick={handleAdd}>إضافة الكود</button>
+            <button onClick={handleAdd}>Add Code</button>
           </div>
         </div>
         <div className="card">
           <div className="card-header">
-            <h2>إدارة الأكواد</h2>
+            <h2>Manage Codes</h2>
           </div>
           <div className="card-body">
             <table>
               <thead>
                 <tr>
-                  <th>الكود</th>
-                  <th>اسم الرابط</th>
-                  <th>اللون</th>
-                  <th>الإجراءات</th>
+                  <th>Code</th>
+                  <th>URL Name</th>
+                  <th>Color</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -185,9 +189,8 @@ function App() {
                       {item.ColorId}
                     </td>
                     <td className="actions">
-                      <button className="edit-btn" onClick={() => openEditModal(item)}>تعديل</button>
-                      <button className="delete-btn" onClick={() => handleDelete(item.row)}>حذف</button>
-                      <button className="link-btn" onClick={() => handleOpenLandingUrl(item)}>فتح الرابط</button>
+                      <button className="edit-btn" onClick={() => openEditModal(item)}>Edit</button>
+                      <button className="delete-btn" onClick={() => handleDelete(item.row)}>Delete</button>
                     </td>
                   </tr>
                 ))}
@@ -196,11 +199,10 @@ function App() {
           </div>
         </div>
       </main>
-      <Dialog.Root open={isEditing} onOpenChange={setIsEditing}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="DialogOverlay" />
-          <Dialog.Content className="DialogContent">
-            <Dialog.Title className="DialogTitle">تعديل الكود (صف: {currentIndex})</Dialog.Title>
+      {isEditing && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Edit Code (Row: {currentIndex})</h2>
             <input
               type="text"
               value={currentCode}
@@ -212,7 +214,7 @@ function App() {
               onChange={(e) => setCurrentUrlName(e.target.value)}
             />
             <div className="color-picker-wrapper">
-              <label htmlFor="edit-color-picker">لون المعرف:</label>
+              <label htmlFor="edit-color-picker">Color ID:</label>
               <input
                 id="edit-color-picker"
                 type="color"
@@ -221,20 +223,13 @@ function App() {
               />
               <span>{currentColorId}</span>
             </div>
-            <div style={{ display: 'flex', marginTop: 25, justifyContent: 'flex-end', gap: '10px' }}>
-              <Dialog.Close asChild>
-                <button className="cancel-btn">إلغاء</button>
-              </Dialog.Close>
-              <button onClick={handleEdit}>حفظ التغييرات</button>
+            <div className="modal-actions">
+              <button onClick={handleEdit}>Save Changes</button>
+              <button className="cancel-btn" onClick={closeEditModal}>Cancel</button>
             </div>
-            <Dialog.Close asChild>
-              <button className="IconButton" aria-label="Close">
-                <Cross2Icon />
-              </button>
-            </Dialog.Close>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
