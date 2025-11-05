@@ -95,7 +95,8 @@ function App() {
       setCurrentUrlName('');
       setCurrentColorId('#ffffff');
       fetchData();
-    } catch (error)      console.error("Error editing data:", error);
+    } catch (error){
+      console.error("Error editing data:", error);
     }
     setIsLoading(false);
   };
