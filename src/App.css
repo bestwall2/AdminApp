@@ -1,24 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
 
 :root {
-  --primary-color: #6a11cb;
-  --secondary-color: #2575fc;
-  --background-color: #f4f7f6;
-  --card-background: #ffffff;
-  --text-color: #333;
+  --background-color: #1a1a2e;
+  --card-background: #162447;
+  --primary-color: #1f4068;
+  --secondary-color: #e43f5a;
+  --text-color: #ffffff;
   --header-color: #ffffff;
   --danger-color: #e74c3c;
   --success-color: #2ecc71;
-  --box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  --box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   --border-radius: 12px;
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Cairo', sans-serif;
   margin: 0;
   padding: 0;
   background-color: var(--background-color);
   color: var(--text-color);
+  direction: rtl;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -30,7 +31,7 @@ body {
 }
 
 header {
-  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  background: var(--card-background);
   color: var(--header-color);
   padding: 20px 40px;
   border-radius: var(--border-radius);
@@ -42,7 +43,7 @@ header {
 header h1 {
   margin: 0;
   font-size: 2.5em;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 main {
@@ -59,18 +60,18 @@ main {
 
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
 
 .card-header {
   padding: 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--primary-color);
 }
 
 .card-header h2 {
   margin: 0;
   font-size: 1.5em;
-  color: var(--primary-color);
+  color: var(--secondary-color);
 }
 
 .card-body {
@@ -80,34 +81,36 @@ main {
 input[type="text"] {
   width: 100%;
   padding: 12px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--primary-color);
   border-radius: 8px;
   margin-bottom: 15px;
   font-size: 1em;
+  background-color: var(--background-color);
+  color: var(--text-color);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 input[type="text"]:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2);
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 3px rgba(228, 63, 90, 0.3);
 }
 
 button {
-  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  background: var(--secondary-color);
   color: #fff;
   border: none;
   padding: 12px 20px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 1em;
-  font-weight: 600;
+  font-weight: 700;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 table {
@@ -117,20 +120,20 @@ table {
 
 th, td {
   padding: 15px;
-  text-align: left;
+  text-align: right;
 }
 
 thead {
-  background-color: #f9f9f9;
+  background-color: var(--primary-color);
 }
 
 th {
-  font-weight: 600;
-  color: var(--primary-color);
+  font-weight: 700;
+  color: var(--text-color);
 }
 
 tbody tr {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--primary-color);
   transition: background-color 0.3s ease;
 }
 
@@ -139,7 +142,7 @@ tbody tr:last-child {
 }
 
 tbody tr:hover {
-  background-color: #f1f1f1;
+  background-color: var(--primary-color);
 }
 
 .actions {
@@ -147,80 +150,25 @@ tbody tr:hover {
   gap: 10px;
 }
 
-.edit-btn, .delete-btn, .cancel-btn {
+.edit-btn, .delete-btn, .cancel-btn, .link-btn {
   padding: 8px 12px;
   font-size: 0.9em;
 }
 
 .edit-btn {
-  background: linear-gradient(45deg, var(--success-color), #2ecc71b3);
+  background: var(--success-color);
 }
 
 .delete-btn {
-  background: linear-gradient(45deg, var(--danger-color), #e74c3cb3);
+  background: var(--danger-color);
 }
 
 .cancel-btn {
-  background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+  background: #95a5a6;
 }
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: fadeIn 0.3s ease;
-}
-
-.modal-content {
-  background-color: #fff;
-  padding: 30px;
-  border-radius: var(--border-radius);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  width: 90%;
-  max-width: 500px;
-  animation: slideIn 0.4s ease;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.loader {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid var(--primary-color);
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1s linear infinite;
-  z-index: 1000;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideIn {
-  from { transform: translateY(-50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+.link-btn {
+  background: #3498db;
 }
 
 .color-picker-wrapper {
@@ -231,7 +179,7 @@ tbody tr:hover {
 }
 
 .color-picker-wrapper label {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .color-picker-wrapper input[type="color"] {
@@ -250,7 +198,86 @@ tbody tr:hover {
   display: inline-block;
   margin-right: 10px;
   vertical-align: middle;
-  border: 1px solid #eee;
+  border: 1px solid var(--primary-color);
+}
+
+.DialogOverlay {
+  background-color: rgba(0, 0, 0, 0.6);
+  position: fixed;
+  inset: 0;
+  animation: fadeIn 0.3s ease;
+}
+
+.DialogContent {
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 500px;
+  padding: 30px;
+  animation: slideIn 0.4s ease;
+}
+
+.DialogTitle {
+  margin: 0 0 20px 0;
+  font-weight: 700;
+  color: var(--secondary-color);
+  font-size: 1.5em;
+}
+
+.DialogDescription {
+  margin: 0 0 20px 0;
+  color: var(--text-color);
+}
+
+.IconButton {
+  font-family: inherit;
+  border-radius: 100%;
+  height: 25px;
+  width: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+
+.loader {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid var(--secondary-color);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  z-index: 1000;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translate(-50%, -40%); opacity: 0; }
+  to { transform: translate(-50%, -50%); opacity: 1; }
 }
 
 @media (max-width: 768px) {
@@ -269,23 +296,23 @@ tbody tr:hover {
     left: -9999px;
   }
   tr {
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--primary-color);
     margin-bottom: 10px;
   }
   td {
     border: none;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--primary-color);
     position: relative;
     padding-left: 50%;
     white-space: normal;
-    text-align: left;
+    text-align: right;
   }
   td:before {
     position: absolute;
     top: 6px;
-    left: 6px;
+    right: 6px;
     width: 45%;
-    padding-right: 10px;
+    padding-left: 10px;
     white-space: nowrap;
     content: attr(data-label);
     font-weight: bold;
