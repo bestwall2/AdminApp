@@ -155,7 +155,9 @@ tbody tr:hover {
 .edit-btn {
   background: linear-gradient(45deg, var(--success-color), #2ecc71b3);
 }
-
+.link-btn {
+  background: linear-gradient(45deg, var(--danger-color), #01c7fc);
+}
 .delete-btn {
   background: linear-gradient(45deg, var(--danger-color), #e74c3cb3);
 }
