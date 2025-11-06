@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { fetchData as fetchApiData, addData, updateData, deleteData } from './lib/api';
-import { Plus, Edit, Trash, ExternalLink } from 'lucide-react';
+import { Plus, Edit, Trash, ExternalLink, Moon, Sun, Menu, X } from 'lucide-react';
 
 interface DataItem {
   Codes: string;
@@ -17,10 +17,30 @@ export default function Home() {
   const [currentItem, setCurrentItem] = useState<DataItem | null>(null);
   const [formData, setFormData] = useState({ Codes: '', UrlName: '', ColorId: '#ffffff' });
   const [isLoading, setIsLoading] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     loadData();
+    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setIsDarkMode(prefersDarkMode);
   }, []);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
   const loadData = async () => {
     setIsLoading(true);
@@ -108,20 +128,28 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen font-cairo">
-      <ToastContainer theme="dark" />
+    <div className="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark min-h-screen font-cairo">
+      <ToastContainer theme={isDarkMode ? 'dark' : 'light'} />
       {isLoading && <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex items-center justify-center"><div className="loader"></div></div>}
       <div className="flex">
-        <aside className="w-64 bg-white dark:bg-gray-800 p-8 shadow-lg">
-          <h1 className="text-2xl font-bold mb-8">Admin Panel</h1>
-          <nav>
-            <ul>
-              <li><a href="#" className="flex items-center gap-4 text-lg p-4 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300"><Plus size={20} /> Add New Code</a></li>
-            </ul>
-          </nav>
+        <aside className={`w-64 bg-card-light dark:bg-card-dark p-8 shadow-lg flex-col justify-between fixed h-full z-10 md:relative md:flex ${isSidebarOpen ? 'flex' : 'hidden'}`}>
+          <div>
+            <h1 className="text-2xl font-bold mb-8 text-primary-light dark:text-primary-dark">Admin Panel</h1>
+            <nav>
+              <ul>
+                <li><a href="#" className="flex items-center gap-4 text-lg p-4 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300"><Plus size={20} /> Add New Code</a></li>
+              </ul>
+            </nav>
+          </div>
+          <button onClick={toggleDarkMode} className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300">
+            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
         </aside>
-        <main className="flex-1 p-12 fade-in">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-12">
+        <main className="flex-1 p-4 md:p-12 fade-in">
+          <button onClick={toggleSidebar} className="md:hidden p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 mb-4">
+            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+          <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-xl p-8 mb-12">
             <h2 className="text-3xl font-bold mb-6">Add New Code</h2>
             <form onSubmit={handleAdd} className="grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
               <input
@@ -130,7 +158,8 @@ export default function Home() {
                 placeholder="Enter new code"
                 value={formData.Codes}
                 onChange={handleInputChange}
-                className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="bg-background-light dark:bg-background-dark p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark"
+                aria-label="New Code"
               />
               <input
                 type="text"
@@ -138,7 +167,8 @@ export default function Home() {
                 placeholder="Enter URL name"
                 value={formData.UrlName}
                 onChange={handleInputChange}
-                className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="bg-background-light dark:bg-background-dark p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark"
+                aria-label="URL Name"
               />
               <div className="flex items-center gap-4">
                 <label htmlFor="color-picker" className="text-lg">Color ID:</label>
@@ -149,15 +179,16 @@ export default function Home() {
                   value={formData.ColorId}
                   onChange={handleInputChange}
                   className="w-16 h-10 rounded-lg"
+                  aria-label="Color ID"
                 />
               </div>
-              <button type="submit" className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300">
+              <button type="submit" className="bg-gradient-to-r from-primary-light to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300">
                 Add Code
               </button>
             </form>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+          <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-xl p-8">
             <h2 className="text-3xl font-bold mb-6">Manage Codes</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -179,9 +210,9 @@ export default function Home() {
                         {item.ColorId}
                       </td>
                       <td className="p-4 flex gap-2">
-                        <button onClick={() => openEditModal(item)} className="p-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white transition-all duration-300"><Edit size={20} /></button>
-                        <button onClick={() => handleDelete(item.Codes)} className="p-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition-all duration-300"><Trash size={20} /></button>
-                        <a href={generateLink(item)} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-green-500 hover:bg-green-600 text-white transition-all duration-300"><ExternalLink size={20} /></a>
+                        <button onClick={() => openEditModal(item)} className="p-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white transition-all duration-300" aria-label="Edit"><Edit size={20} /></button>
+                        <button onClick={() => handleDelete(item.Codes)} className="p-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition-all duration-300" aria-label="Delete"><Trash size={20} /></button>
+                        <a href={generateLink(item)} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-green-500 hover:bg-green-600 text-white transition-all duration-300" aria-label="Generate Link"><ExternalLink size={20} /></a>
                       </td>
                     </tr>
                   ))}
@@ -193,8 +224,8 @@ export default function Home() {
       </div>
 
       {isModalOpen && currentItem && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-70 flex items-center justify-center z-40">
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg">
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-70 flex items-center justify-center z-40" role="dialog" aria-modal="true">
+          <div className="bg-card-light dark:bg-card-dark p-8 rounded-lg shadow-xl w-full max-w-lg">
             <h2 className="text-3xl font-bold mb-6">Edit Code</h2>
             <form onSubmit={handleEdit} className="grid grid-cols-1 gap-6">
               <input
@@ -202,15 +233,17 @@ export default function Home() {
                 name="Codes"
                 value={currentItem.Codes}
                 onChange={handleEditInputChange}
-                className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg"
+                className="bg-background-light dark:bg-background-dark p-4 rounded-lg"
                 readOnly
+                aria-label="Code"
               />
               <input
                 type="text"
                 name="UrlName"
                 value={currentItem.UrlName}
                 onChange={handleEditInputChange}
-                className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg"
+                className="bg-background-light dark:bg-background-dark p-4 rounded-lg"
+                aria-label="URL Name"
               />
               <div className="flex items-center gap-4">
                 <label htmlFor="edit-color-picker" className="text-lg">Color ID:</label>
@@ -221,11 +254,12 @@ export default function Home() {
                   value={currentItem.ColorId}
                   onChange={handleEditInputChange}
                   className="w-16 h-10 rounded-lg"
+                  aria-label="Color ID"
                 />
               </div>
               <div className="flex justify-end gap-4 mt-6">
-                <button type="submit" className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300">Save Changes</button>
-                <button type="button" onClick={closeEditModal} className="bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-bold py-2 px-6 rounded-lg transition-all duration-300">Cancel</button>
+                <button type="submit" className="bg-gradient-to-r from-primary-light to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300">Save Changes</button>
+                <button type="button" onClick={closeEditModal} className="bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-700 text-text-light dark:text-text-dark font-bold py-2 px-6 rounded-lg transition-all duration-300">Cancel</button>
               </div>
             </form>
           </div>
