@@ -105,4 +105,30 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+/* --- Admin Layout --- */
+
+.card {
+  @apply bg-white dark:bg-card-dark rounded-xl shadow-md p-6 transition-all hover:shadow-lg;
+}
+
+.card-header {
+  @apply flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-3 mb-4;
+}
+
+.card-title {
+  @apply text-lg font-semibold text-gray-800 dark:text-gray-100;
+}
+
+.table {
+  @apply w-full text-sm text-left border-collapse;
+}
+
+.table th {
+  @apply bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 p-3 font-medium;
+}
+
+.table td {
+  @apply p-3 border-t border-gray-200 dark:border-gray-700;
+}
+
 
