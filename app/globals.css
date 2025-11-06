@@ -3,30 +3,59 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --background-light: #f9fafb;
+  --text-light: #111827;
+  --primary-light: #3b82f6;
+  --secondary-light: #6b7280;
+  --card-light: #ffffff;
+
+  --background-dark: #111827;
+  --text-dark: #f9fafb;
+  --primary-dark: #60a5fa;
+  --secondary-dark: #9ca3af;
+  --card-dark: #1f2937;
+}
+
 body {
   font-family: 'Cairo', Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background-light);
+  color: var(--text-light);
+}
+
+.dark body {
+  background-color: var(--background-dark);
+  color: var(--text-dark);
 }
 
 .loader {
-  border: 8px solid #f3f3f3; /* Light grey */
-  border-top: 8px solid #3498db; /* Blue */
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 2s linear infinite;
+  border-left-color: var(--primary-light);
+  animation: spin 1s ease-in-out infinite;
+}
+
+.dark .loader {
+  border-left-color: var(--primary-dark);
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
